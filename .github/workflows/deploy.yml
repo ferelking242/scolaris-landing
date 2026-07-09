@@ -26,16 +26,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: scolaris/package-lock.json
 
       - name: 📦 Install dependencies
         working-directory: scolaris
-        run: npm install --legacy-peer-deps --ignore-scripts
+        run: yarn install --non-interactive
 
       - name: 🏗️ Build (static export)
         working-directory: scolaris
-        run: npm run build
+        run: yarn build
 
       - name: ⚙️ Setup Pages
         uses: actions/configure-pages@v5

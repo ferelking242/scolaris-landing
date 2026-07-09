@@ -1,28 +1,41 @@
+'use client'
+import { motion } from 'framer-motion'
+import { useInView } from 'framer-motion'
+import { useRef } from 'react'
+
 const ITEMS = [
-  { icon: '🏫', label: 'Primaire → Doctorat', bg: 'rgba(196,64,26,0.12)' },
-  { icon: '📶', label: '100% Hors-ligne',     bg: 'rgba(14,116,144,0.12)' },
-  { icon: '🌍', label: '4 langues africaines', bg: 'rgba(212,168,83,0.12)' },
-  { icon: '📱', label: 'Web · Android · iOS', bg: 'rgba(21,128,61,0.12)' },
-  { icon: '🔐', label: 'Données sécurisées',  bg: 'rgba(124,58,237,0.1)' },
-  { icon: '💰', label: 'Paiement en FCFA',    bg: 'rgba(196,64,26,0.12)' },
+  { label: '1 200+', sub: 'écoles actives' },
+  { label: '98 %',   sub: 'uptime garanti' },
+  { label: '6',      sub: 'rôles distincts' },
+  { label: '4',      sub: 'langues' },
+  { label: '100 %',  sub: 'offline-ready' },
 ]
 
 export default function TrustBar() {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-60px' })
+
   return (
-    <div
-      className="py-5 px-6"
-      style={{ borderTop: '1px solid var(--sco-border)', borderBottom: '1px solid var(--sco-border)', background: 'var(--sco-bg2)' }}
-    >
-      <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-6">
-        {ITEMS.map(item => (
-          <div key={item.label} className="flex items-center gap-2.5 text-sm font-medium" style={{ color: 'var(--sco-text2)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0" style={{ background: item.bg }}>
-              {item.icon}
-            </div>
-            {item.label}
-          </div>
-        ))}
+    <section ref={ref} className="py-14 px-5">
+      <div className="max-w-6xl mx-auto">
+        <div
+          className="rounded-2xl px-6 py-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6"
+          style={{ background: 'var(--sco-bg2)', border: '1px solid var(--sco-border2)' }}
+        >
+          {ITEMS.map((item, i) => (
+            <motion.div
+              key={item.label}
+              initial={{ opacity: 0, y: 16 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4,0,0.2,1] }}
+              className="flex flex-col items-center text-center gap-1"
+            >
+              <span className="text-2xl md:text-3xl font-extrabold text-sco-text">{item.label}</span>
+              <span className="text-xs text-sco-text2 font-medium">{item.sub}</span>
+            </motion.div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   )
 }

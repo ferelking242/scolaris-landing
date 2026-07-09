@@ -1,232 +1,174 @@
 'use client'
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Send, MessageCircle, Mail, Github, Check } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
+import { Send, CheckCircle } from 'lucide-react'
+
+const EASE = [0.4, 0, 0.2, 1] as [number, number, number, number]
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', school: '', email: '', tel: '', message: '' })
-  const [sent, setSent] = useState(false)
-  const [sending, setSending] = useState(false)
-  const [error, setError] = useState('')
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-80px' })
 
-  function handle(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    setForm(f => ({ ...f, [e.target.name]: e.target.value }))
-  }
+  const [form, setForm] = useState({ name: '', email: '', school: '', message: '' })
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
 
-  async function submit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setSending(true)
-    setError('')
+    setStatus('loading')
+    setErrorMsg('')
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
-      const json = await res.json()
-      if (!res.ok || !json.success) throw new Error(json.message ?? 'Erreur serveur')
-      setSent(true)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue. Réessayez.')
-    } finally {
-      setSending(false)
+      if (!res.ok) throw new Error('Erreur serveur')
+      setStatus('success')
+    } catch {
+      setStatus('error')
+      setErrorMsg('Une erreur est survenue. Veuillez réessayer ou nous contacter directement.')
     }
   }
 
   return (
-    <section id="contact" className="py-24 px-6">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-        {/* Left: Info */}
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[3px] text-sco-primary mb-5">
-            Commencez maintenant
-          </p>
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-5">
-            Parlons de{' '}
-            <em className="font-serif text-sco-primary" style={{ fontStyle: 'italic' }}>votre école</em>
-          </h2>
-          <p className="text-sco-text2 text-base leading-relaxed mb-12">
-            Répondez au formulaire ou contactez-nous directement. Notre équipe vous rappelle sous 24h pour une démo personnalisée.
-          </p>
+    <section id="contact" className="py-24 px-5">
+      <div className="max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
+          {/* Left */}
+          <motion.div
+            ref={ref}
+            initial={{ opacity: 0, x: -24 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.65, ease: EASE }}
+          >
+            <p className="text-[11px] font-bold uppercase tracking-[3px] text-sco-primary mb-4">
+              Démarrer maintenant
+            </p>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-5">
+              Essayez Scolaris{' '}
+              <em className="font-serif text-sco-primary" style={{ fontStyle: 'italic' }}>gratuitement</em>
+            </h2>
+            <p className="text-sco-text2 text-base leading-relaxed mb-8">
+              30 jours d'essai complet, sans carte bancaire. Notre équipe basée à Brazzaville
+              vous accompagne pour la configuration de votre établissement.
+            </p>
 
-          {/* Contact methods */}
-          <div className="flex flex-col gap-5">
-            {[
-              {
-                icon: MessageCircle,
-                label: 'WhatsApp',
-                value: '+243 XXX XXX XXX',
-                href: 'https://wa.me/243000000000',
-                color: '#25D366',
-                bg: 'rgba(37,211,102,0.1)',
-              },
-              {
-                icon: Mail,
-                label: 'Email',
-                value: 'contact@scolaris.africa',
-                href: 'mailto:contact@scolaris.africa',
-                color: '#C4401A',
-                bg: 'rgba(196,64,26,0.1)',
-              },
-              {
-                icon: Github,
-                label: 'GitHub',
-                value: 'ferelking242/scolaris',
-                href: 'https://github.com/ferelking242/scolaris',
-                color: 'var(--sco-text)',
-                bg: 'var(--sco-bg2)',
-              },
-            ].map(c => {
-              const Icon = c.icon
-              return (
-                <a
-                  key={c.label}
-                  href={c.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 hover:-translate-y-0.5 group"
-                  style={{ background: 'var(--sco-card)', border: '1px solid var(--sco-border)' }}
-                >
+            <div className="flex flex-col gap-4">
+              {[
+                { label: 'Configuration guidée', sub: 'On s\'occupe de tout le paramétrage initial' },
+                { label: 'Formation incluse', sub: 'Vos équipes formées en moins de 2 heures' },
+                { label: 'Support en lingala & français', sub: 'Une équipe locale disponible 6j/7' },
+              ].map(item => (
+                <div key={item.label} className="flex items-start gap-3">
                   <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: c.bg }}
-                  >
-                    <Icon size={20} style={{ color: c.color }} />
-                  </div>
+                    className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
+                    style={{ background: '#C4401A' }}
+                  />
                   <div>
-                    <div className="text-xs font-bold uppercase tracking-wide" style={{ color: 'var(--sco-muted)' }}>{c.label}</div>
-                    <div className="text-sm font-semibold group-hover:text-sco-primary transition-colors">{c.value}</div>
+                    <div className="text-sm font-semibold text-sco-text">{item.label}</div>
+                    <div className="text-sm text-sco-text2">{item.sub}</div>
                   </div>
-                </a>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Right: Form */}
-        <div
-          className="rounded-3xl p-8 md:p-10"
-          style={{
-            background: 'var(--sco-card)',
-            border: '1px solid var(--sco-border)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-          }}
-        >
-          {sent ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center text-center py-16 gap-4"
-            >
-              <div
-                className="w-20 h-20 rounded-full flex items-center justify-center"
-                style={{ background: 'rgba(21,128,61,0.15)' }}
-              >
-                <Check size={40} style={{ color: '#15803D' }} />
-              </div>
-              <h4 className="text-2xl font-bold">Message envoyé !</h4>
-              <p style={{ color: 'var(--sco-text2)' }}>Notre équipe vous répondra sous 24 heures.</p>
-              <button
-                onClick={() => { setSent(false); setForm({ name: '', school: '', email: '', tel: '', message: '' }) }}
-                className="mt-4 px-6 py-2.5 rounded-xl text-sm font-bold"
-                style={{ background: 'var(--sco-bg2)', color: 'var(--sco-text)' }}
-              >
-                Envoyer un autre message
-              </button>
-            </motion.div>
-          ) : (
-            <form onSubmit={submit} className="flex flex-col gap-5">
-              <h3 className="text-xl font-bold mb-2">Demande de démo ou d'essai</h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field name="name" label="Votre nom" placeholder="Amara Diallo" value={form.name} onChange={handle} required />
-                <Field name="school" label="Nom de l'école" placeholder="Lycée de la Paix" value={form.school} onChange={handle} required />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field name="email" type="email" label="Email" placeholder="contact@ecole.cd" value={form.email} onChange={handle} required />
-                <Field name="tel" type="tel" label="WhatsApp / Téléphone" placeholder="+243 XXX XXX" value={form.tel} onChange={handle} />
-              </div>
-              <TextArea name="message" label="Message (optionnel)" placeholder="Décrivez votre établissement, le nombre d'élèves, vos besoins..." value={form.message} onChange={handle} />
-
-              {error && (
-                <div
-                  className="px-4 py-3 rounded-xl text-sm font-medium"
-                  style={{ background: 'rgba(196,64,26,0.12)', color: '#C4401A', border: '1px solid rgba(196,64,26,0.3)' }}
-                >
-                  ⚠ {error}
                 </div>
-              )}
+              ))}
+            </div>
+          </motion.div>
 
-              <button
-                type="submit"
-                disabled={sending}
-                className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-base font-bold text-white transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
-                style={{ background: 'linear-gradient(135deg, #C4401A, #D4A853)', boxShadow: '0 8px 25px rgba(196,64,26,0.35)' }}
+          {/* Form */}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ delay: 0.15, duration: 0.65, ease: EASE }}
+          >
+            {status === 'success' ? (
+              <div
+                className="rounded-2xl p-10 flex flex-col items-center text-center gap-4"
+                style={{ background: 'var(--sco-bg2)', border: '1px solid rgba(21,128,61,0.3)' }}
               >
-                {sending ? (
-                  <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3" />
-                    <path d="M12 2a10 10 0 0110 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                  </svg>
-                ) : (
-                  <Send size={18} />
+                <CheckCircle size={40} style={{ color: '#15803D' }} />
+                <h3 className="text-xl font-bold text-sco-text">Message envoyé</h3>
+                <p className="text-sco-text2 text-sm">
+                  Notre équipe vous contactera dans les 24 heures ouvrables.
+                </p>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                className="rounded-2xl p-6 md:p-8 flex flex-col gap-4"
+                style={{ background: 'var(--sco-bg2)', border: '1px solid var(--sco-border2)' }}
+              >
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-sco-text2">Nom complet</label>
+                    <input
+                      required
+                      value={form.name}
+                      onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                      placeholder="Jean Mbemba"
+                      className="px-3 py-2.5 rounded-xl text-sm text-sco-text outline-none transition-all duration-200 placeholder:text-sco-muted col-span-1"
+                      style={{ background: 'var(--sco-bg3)', border: '1px solid var(--sco-border2)' }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-sco-text2">Email</label>
+                    <input
+                      required
+                      type="email"
+                      value={form.email}
+                      onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                      placeholder="jean@ecole.cg"
+                      className="px-3 py-2.5 rounded-xl text-sm text-sco-text outline-none transition-all duration-200 placeholder:text-sco-muted"
+                      style={{ background: 'var(--sco-bg3)', border: '1px solid var(--sco-border2)' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-sco-text2">Nom de l'établissement</label>
+                  <input
+                    required
+                    value={form.school}
+                    onChange={e => setForm(f => ({ ...f, school: e.target.value }))}
+                    placeholder="Collège de la Corniche, Brazzaville"
+                    className="px-3 py-2.5 rounded-xl text-sm text-sco-text outline-none transition-all duration-200 placeholder:text-sco-muted"
+                    style={{ background: 'var(--sco-bg3)', border: '1px solid var(--sco-border2)' }}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-sco-text2">Message (optionnel)</label>
+                  <textarea
+                    rows={3}
+                    value={form.message}
+                    onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                    placeholder="Parlez-nous de votre établissement…"
+                    className="px-3 py-2.5 rounded-xl text-sm text-sco-text outline-none transition-all duration-200 placeholder:text-sco-muted resize-none"
+                    style={{ background: 'var(--sco-bg3)', border: '1px solid var(--sco-border2)' }}
+                  />
+                </div>
+
+                {errorMsg && (
+                  <p className="text-xs text-red-400">{errorMsg}</p>
                 )}
-                {sending ? 'Envoi en cours…' : 'Envoyer la demande'}
-              </button>
-            </form>
-          )}
+
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-sco-primary text-white text-sm font-bold hover:brightness-110 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{ boxShadow: '0 6px 20px rgba(196,64,26,0.3)' }}
+                >
+                  {status === 'loading' ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Send size={15} />
+                  )}
+                  {status === 'loading' ? 'Envoi…' : 'Envoyer ma demande'}
+                </button>
+              </form>
+            )}
+          </motion.div>
         </div>
       </div>
     </section>
-  )
-}
-
-function Field({ name, label, placeholder, value, onChange, type = 'text', required = false }: {
-  name: string; label: string; placeholder: string; value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  type?: string; required?: boolean
-}) {
-  return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-xs font-bold" style={{ color: 'var(--sco-text2)' }}>{label}{required && ' *'}</span>
-      <input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        required={required}
-        className="px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2"
-        style={{
-          background: 'var(--sco-bg2)',
-          border: '1px solid var(--sco-border2)',
-          color: 'var(--sco-text)',
-        }}
-      />
-    </label>
-  )
-}
-
-function TextArea({ name, label, placeholder, value, onChange }: {
-  name: string; label: string; placeholder: string; value: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-}) {
-  return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-xs font-bold" style={{ color: 'var(--sco-text2)' }}>{label}</span>
-      <textarea
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        rows={4}
-        className="px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 resize-none"
-        style={{
-          background: 'var(--sco-bg2)',
-          border: '1px solid var(--sco-border2)',
-          color: 'var(--sco-text)',
-        }}
-      />
-    </label>
   )
 }

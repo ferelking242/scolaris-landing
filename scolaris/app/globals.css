@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Theme Variables ─────────────────────────────── */
+:root,
+.dark {
+  --sco-bg:      #080B10;
+  --sco-bg2:     #0F1520;
+  --sco-bg3:     #141D2E;
+  --sco-card:    #0F1520;
+  --sco-border:  rgba(255,255,255,0.07);
+  --sco-border2: rgba(255,255,255,0.13);
+  --sco-text:    #EEE8DF;
+  --sco-text2:   #A8A098;
+  --sco-muted:   #6B7280;
+  --sco-nav:     rgba(8,11,16,0.85);
+  --sco-shadow:  0 8px 40px rgba(0,0,0,0.5);
+}
+
+.light {
+  --sco-bg:      #FAF7F2;
+  --sco-bg2:     #F0EBE3;
+  --sco-bg3:     #E5DDD4;
+  --sco-card:    #FFFFFF;
+  --sco-border:  rgba(0,0,0,0.08);
+  --sco-border2: rgba(0,0,0,0.15);
+  --sco-text:    #1A1210;
+  --sco-text2:   #4A3C30;
+  --sco-muted:   #7A6E65;
+  --sco-nav:     rgba(250,247,242,0.90);
+  --sco-shadow:  0 8px 40px rgba(0,0,0,0.10);
+}
+
+.oled {
+  --sco-bg:      #000000;
+  --sco-bg2:     #060606;
+  --sco-bg3:     #0C0C0C;
+  --sco-card:    #080808;
+  --sco-border:  rgba(255,255,255,0.05);
+  --sco-border2: rgba(255,255,255,0.09);
+  --sco-text:    #EEE8DF;
+  --sco-text2:   #9A9288;
+  --sco-muted:   #5A6270;
+  --sco-nav:     rgba(0,0,0,0.92);
+  --sco-shadow:  0 8px 60px rgba(0,0,0,0.8);
+}
+
+/* ── Base ────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  background: var(--sco-bg);
+}
+
+body {
+  background: var(--sco-bg);
+  color: var(--sco-text);
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ── Scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--sco-bg); }
+::-webkit-scrollbar-thumb { background: var(--sco-border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #C4401A; }
+
+/* ── Utilities ───────────────────────────────────── */
+.gradient-text-primary {
+  background: linear-gradient(135deg, #C4401A, #D4A853);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-teal {
+  background: linear-gradient(135deg, #0E7490, #67E8F9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow-primary {
+  box-shadow: 0 0 40px rgba(196,64,26,0.3);
+}
+
+.glow-teal {
+  box-shadow: 0 0 40px rgba(14,116,144,0.3);
+}
+
+/* ── Scrollable track (screenshots) ─────────────── */
+.scroll-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scroll-track::-webkit-scrollbar { display: none; }
+
+/* ── Prose serif italic ──────────────────────────── */
+.serif-italic {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+}
+
+@layer utilities {
+  .border-sco { border-color: var(--sco-border); }
+  .border-sco2 { border-color: var(--sco-border2); }
+  .bg-sco-nav { background: var(--sco-nav); }
+}

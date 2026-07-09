@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  output: 'export',
+  trailingSlash: true,
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -8,7 +10,6 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
     ],
   },
-  allowedDevOrigins: ['127.0.0.1', 'localhost', '*.replit.dev', '*.repl.co'],
 }
 
 export default nextConfig

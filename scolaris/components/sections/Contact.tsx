@@ -16,19 +16,11 @@ export default function Contact() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setStatus('loading')
-    setErrorMsg('')
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      if (!res.ok) throw new Error('Erreur serveur')
-      setStatus('success')
-    } catch {
-      setStatus('error')
-      setErrorMsg('Une erreur est survenue. Veuillez réessayer ou nous contacter directement.')
-    }
+    const msg = encodeURIComponent(
+      `Bonjour Scolaris ! 👋\n\nNom: ${form.name}\nEmail: ${form.email}\nÉtablissement: ${form.school}${form.message ? '\n\nMessage: ' + form.message : ''}`
+    )
+    window.open(`https://wa.me/242060000000?text=${msg}`, '_blank')
+    setStatus('success')
   }
 
   return (

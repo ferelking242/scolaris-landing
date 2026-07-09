@@ -25,13 +25,13 @@ jobs:
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: scolaris/package-lock.json
 
       - name: 📦 Install dependencies
         working-directory: scolaris
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --ignore-scripts
 
       - name: 🏗️ Build (static export)
         working-directory: scolaris
